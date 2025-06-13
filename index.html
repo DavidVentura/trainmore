@@ -338,14 +338,14 @@
 
                 // Generate QR code
                 const qrCodeDiv = document.getElementById('qrcode');
-                new QRCode(qrCodeDiv, data.content, {
-                    width: 200,
-                    height: 200,
+                new QRCode(qrCodeDiv, {
+		    text: data.content,
+                    width: 256,
+                    height: 256,
                     margin: 2,
-                    color: {
-                        dark: '#333333',
-                        light: '#ffffff'
-                    }
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.L,
                 });
             } catch (error) {
                 showError(error.message);
