@@ -117,9 +117,9 @@ async def serve_index():
     return FileResponse("index.html")
 
 
-@app.get("/qrcode.min.js")
+@app.get("/qr.min.js")
 async def serve_qrcode():
-    return FileResponse("qrcode.min.js")
+    return FileResponse("qr.min.js")
 
 
 if __name__ == "__main__":

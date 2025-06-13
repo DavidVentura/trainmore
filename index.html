@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainmore App</title>
-    <script src="/qrcode.min.js"></script>
+    <script src="/qr.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -136,7 +136,7 @@
         }
 
         #qrcode {
-            margin: 1.5rem 0;
+            margin: 1.5rem auto;
             display: flex;
             justify-content: center;
         }
@@ -203,7 +203,7 @@
                 <span id="qrText">Generate QR Code</span>
             </button>
             
-            <div id="qrcode"></div>
+            <img id="qrcode"/>
             <div id="qrInfo" class="qr-info hidden"></div>
             
             <button class="btn btn-secondary" onclick="logout()">Logout</button>
@@ -283,7 +283,7 @@
             hideMessages();
             
             // Clear previous QR code
-            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('qrcode').src = '';
             document.getElementById('qrInfo').classList.add('hidden');
 
             try {
@@ -319,7 +319,7 @@
                         const qrCodeDiv = document.getElementById('qrcode');
                         const qrInfo = document.getElementById('qrInfo');
                         
-                        qrCodeDiv.innerHTML = '<p style="color: #dc3545; font-weight: bold;">QR Code Expired</p>';
+                        qrCodeDiv.src = '';
                         qrInfo.innerHTML = `
                             <strong style="color: #dc3545;">QR Code Expired</strong><br>
                             Expired at: ${expiryDate.toLocaleString()}<br>
@@ -338,15 +338,15 @@
 
                 // Generate QR code
                 const qrCodeDiv = document.getElementById('qrcode');
-                new QRCode(qrCodeDiv, {
-		    text: data.content,
-                    width: 256,
-                    height: 256,
-                    margin: 2,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.L,
+                const gifBytes = qr.encodeQR(data.content, 'gif', {
+                    ecc: "low",
+                    version: 2,
+                    mask: 7,
+                    scale: 11,
                 });
+                const blob = new Blob([gifBytes], { type: 'image/gif' });
+                const url = URL.createObjectURL(blob);
+                qrCodeDiv.src = url;
             } catch (error) {
                 showError(error.message);
             } finally {
@@ -374,7 +374,7 @@
             document.getElementById('password').value = '';
             
             // Clear any existing QR code
-            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('qrcode').src = '';
             document.getElementById('qrInfo').classList.add('hidden');
         }
 
