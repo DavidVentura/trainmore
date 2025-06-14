@@ -194,11 +194,10 @@
         <!-- Dashboard -->
         <div id="dashboard" class="hidden">
             <div class="user-info">
-                <h3>Welcome back!</h3>
                 <div class="user-email" id="userEmail"></div>
             </div>
             
-            <button class="btn" onclick="generateQR()">
+            <button class="btn" onclick="generateQR(true)" id="generateQR">
                 <span id="qrSpinner" class="loading hidden"></span>
                 <span id="qrText">Generate QR Code</span>
             </button>
@@ -271,7 +270,7 @@
             }
         }
 
-        async function generateQR() {
+        async function generateQR(humanInitiated) {
             const token = localStorage.getItem('trainmore_token');
             
             if (!token) {
@@ -282,10 +281,6 @@
             setLoadingState('qr', true);
             hideMessages();
             
-            // Clear previous QR code
-            document.getElementById('qrcode').src = '';
-            document.getElementById('qrInfo').classList.add('hidden');
-
             try {
                 const response = await fetch(`${API_BASE}/qr-code`, {
                     method: 'POST',
@@ -312,32 +307,30 @@
                 const expiryDate = new Date(data.expiry_date);
                 const now = new Date();
                 const timeUntilExpiry = expiryDate.getTime() - now.getTime();
+		console.log(`QR Code expires in ${timeUntilExpiry}. Human initiated: ${humanInitiated}`);
 
+		const qrButton = document.getElementById("generateQR");
+		qrButton.classList.add('hidden');
+		const qrCodeDiv = document.getElementById('qrcode');
                 if (timeUntilExpiry > 0) {
                     // Set timer to hide QR code when it expires
                     setTimeout(() => {
-                        const qrCodeDiv = document.getElementById('qrcode');
-                        const qrInfo = document.getElementById('qrInfo');
-                        
-                        qrCodeDiv.src = '';
-                        qrInfo.innerHTML = `
-                            <strong style="color: #dc3545;">QR Code Expired</strong><br>
-                            Expired at: ${expiryDate.toLocaleString()}<br>
-                            <small>Please generate a new QR code</small>
-                        `;
-                        
-                        showError('QR code has expired. Please generate a new one.');
+			if (humanInitiated) {
+			    generateQR(false); // regenerate the QR code _once_
+			} else {
+			    console.log("hiding qr & showing button");
+                            qrCodeDiv.src = '';
+			    qrButton.classList.remove('hidden');
+			}
                     }, timeUntilExpiry);
-                    
                     console.log(`QR code will expire in ${Math.round(timeUntilExpiry / 1000)} seconds`);
                 } else {
-                    // QR code is already expired
+                    // Got an expired QR
                     showError('This QR code has already expired. Please generate a new one.');
                     return;
                 }
 
-                // Generate QR code
-                const qrCodeDiv = document.getElementById('qrcode');
+                console.log("rendering QR");
                 const gifBytes = qr.encodeQR(data.content, 'gif', {
                     ecc: "low",
                     version: 2,
