@@ -176,7 +176,7 @@
         <div class="logo">🏋️ Trainmore</div>
         
         <!-- Login Form -->
-	<div id="loginForm">
+        <div id="loginForm">
             <form id="loginFormElement" onsubmit="handleFormSubmit(event)">
                 <div class="form-group">
                     <label for="username">Email</label>
@@ -218,7 +218,7 @@
     <script>
         const API_BASE = '';
         
-	function handleFormSubmit(event) {
+        function handleFormSubmit(event) {
             event.preventDefault(); // Prevent default form submission
             login(); // Call your existing login function
         }
@@ -312,21 +312,21 @@
                 const expiryDate = new Date(data.expiry_date);
                 const now = new Date();
                 const timeUntilExpiry = expiryDate.getTime() - now.getTime();
-		console.log(`QR Code expires in ${timeUntilExpiry}. Human initiated: ${humanInitiated}`);
+                console.log(`QR Code expires in ${timeUntilExpiry}. Human initiated: ${humanInitiated}`);
 
-		const qrButton = document.getElementById("generateQR");
-		qrButton.classList.add('hidden');
-		const qrCodeDiv = document.getElementById('qrcode');
+                const qrButton = document.getElementById("generateQR");
+                qrButton.classList.add('hidden');
+                const qrCodeDiv = document.getElementById('qrcode');
                 if (timeUntilExpiry > 0) {
                     // Set timer to hide QR code when it expires
                     setTimeout(() => {
-			if (humanInitiated) {
-			    generateQR(false); // regenerate the QR code _once_
-			} else {
-			    console.log("hiding qr & showing button");
+                        if (humanInitiated) {
+                           generateQR(false); // regenerate the QR code _once_
+                        } else {
+                            console.log("hiding qr & showing button");
                             qrCodeDiv.src = '';
-			    qrButton.classList.remove('hidden');
-			}
+                            qrButton.classList.remove('hidden');
+                        }
                     }, timeUntilExpiry);
                     console.log(`QR code will expire in ${Math.round(timeUntilExpiry / 1000)} seconds`);
                 } else {
