@@ -176,19 +176,21 @@
         <div class="logo">🏋️ Trainmore</div>
         
         <!-- Login Form -->
-        <div id="loginForm">
-            <div class="form-group">
-                <label for="username">Email</label>
-                <input type="email" id="username" placeholder="your@email.com" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            <button class="btn" onclick="login()">
-                <span id="loginSpinner" class="loading hidden"></span>
-                <span id="loginText">Login</span>
-            </button>
+	<div id="loginForm">
+            <form id="loginFormElement" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" name="username" placeholder="your@email.com" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn">
+                    <span id="loginSpinner" class="loading hidden"></span>
+                    <span id="loginText">Login</span>
+                </button>
+            </form>
         </div>
 
         <!-- Dashboard -->
@@ -216,6 +218,10 @@
     <script>
         const API_BASE = '';
         
+	function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+            login(); // Call your existing login function
+        }
         // Check if user is already logged in
         window.onload = function() {
             const token = localStorage.getItem('trainmore_token');
@@ -260,8 +266,7 @@
                 localStorage.setItem('trainmore_token', data.access_token);
                 localStorage.setItem('trainmore_email', username);
 
-                showSuccess('Login successful!');
-                setTimeout(() => showDashboard(username), 1000);
+                showDashboard(username);
 
             } catch (error) {
                 showError(error.message);
@@ -354,7 +359,6 @@
             
             // Show login form
             showLoginForm();
-            showSuccess('Logged out successfully!');
         }
 
         function showDashboard(email) {
