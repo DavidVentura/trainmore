@@ -6,12 +6,13 @@ from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from requests.auth import HTTPBasicAuth
 
 app = FastAPI()
 
 QR_CODE_URL = "https://my.trainmore.nl/nox/v1/customerqrcode/"
+CHECKIN_HISTORY_URL = "https://my.trainmore.nl/nox/v1/studios/checkin/history/report"
 LOGIN_URL = "https://my.trainmore.nl/login"
 REGISTER_URL = "https://my.trainmore.nl/v2/public/register"
 
@@ -91,6 +92,54 @@ async def get_qr_code(request: TokenRequest):
 
     data = r.json()
     return QRResponse(expiry_date=datetime.fromisoformat(data["expiryDate"]), content=data["content"])
+
+
+
+class GymVisit(BaseModel):
+    checkin_time: datetime
+    checkout_time: datetime
+    studio_name: str
+
+    @computed_field
+    @property
+    def duration_minutes(self) -> int:
+        delta = self.checkout_time - self.checkin_time
+        return int(delta.total_seconds() / 60)
+
+
+    @staticmethod
+    def from_raw_dict(data: dict[str, str]) -> 'GymVisit':
+        return GymVisit(
+            checkin_time=parse_datetime_with_timezone(data['checkinTime']),
+            checkout_time=parse_datetime_with_timezone(data['checkoutTime']),
+            studio_name=data['studioName']
+        )
+def parse_datetime_with_timezone(datetime_str: str) -> datetime:
+    """
+    Parse datetime string with timezone like '2025-06-16T11:55:09.534+02:00[Europe/Amsterdam]'
+    """
+    clean_datetime, _, _ = datetime_str.partition('[')
+    return datetime.fromisoformat(clean_datetime)
+
+
+
+@app.post("/checkin-history", response_model=list[GymVisit])
+async def get_checkin_history(request: TokenRequest):
+    r = requests.get(CHECKIN_HISTORY_URL, headers={**HEADERS, "x-auth-token": request.token})
+    """
+    [{
+      "date": "2025-06-16",
+      "checkinTime": "2025-06-16T11:00:00.000+02:00[Europe/Amsterdam]",
+      "checkoutTime": "2025-06-16T13:00:00.000+02:00[Europe/Amsterdam]",
+      "studioName": "Trainmore Amsterdam Scheldeplein B.V."
+    }]
+    """
+    if not r.ok:
+        raise HTTPException(status_code=500, detail="Bad token")
+
+    data = r.json()
+    visits = [GymVisit.from_raw_dict(item) for item in data]
+    return [v for v in visits if v.duration_minutes > 0]
 
 
 @app.post("/register")
