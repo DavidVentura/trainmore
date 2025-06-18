@@ -1,13 +1,15 @@
 # Trainmore app
 
 
-Since 2025-06-12, Trainmore has decided to make using their app mandatory to enter the gym.
+## 🧞 Commands
 
-The app has trackers, is over 100MiB and is flat-out worse than having the key fob.
+All commands are run from the root of the project, from a terminal:
 
-This project brings a little control back.
-
-
-The frontend is AI-generated and looks like this:
-
-![screenshot](https://raw.githubusercontent.com/davidventura/trainmore/master/screenshot/example.png)
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `pnpm install`             | Installs dependencies                            |
+| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
+| `pnpm build`           | Build your production site to `./dist/`          |
+| `pnpm preview`         | Preview your build locally, before deploying     |
+| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `pnpm astro -- --help` | Get help using the Astro CLI                     |

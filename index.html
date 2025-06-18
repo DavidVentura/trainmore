@@ -216,7 +216,7 @@
     </div>
 
     <script>
-        const API_BASE = '';
+        const API_BASE = 'http://localhost:4321/api';
         
         function handleFormSubmit(event) {
             event.preventDefault(); // Prevent default form submission
@@ -288,13 +288,11 @@
             
             try {
                 const response = await fetch(`${API_BASE}/qr-code`, {
-                    method: 'POST',
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
+		    'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({
-                        token: token
-                    })
                 });
 
                 const data = await response.json();
