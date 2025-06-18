@@ -32,7 +32,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!response.ok) {
       const errorText = await response.text();
       const errorMessage = getErrorMessage(errorText);
-      return createErrorResponse(errorMessage || `Request failed: ${errorText}`);
+      return createErrorResponse(
+        errorMessage || `Request failed: ${errorText}`,
+        401
+      );
     }
 
     const data = await response.json();
