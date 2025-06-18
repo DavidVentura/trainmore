@@ -161,6 +161,42 @@ async def register(request: RegisterRequest):
     return r.json()
 
 
+"""
+/nox/v1/studios/home
+{
+  "id": 1224532440,
+  "zoneId": "Europe/Amsterdam",
+  "name": "Amsterdam Scheldeplein",
+  ...
+  "openingHours": [
+    {
+      "dayOfWeekFrom": "MONDAY",
+      "dayOfWeekTo": "MONDAY",
+      "timeFrom": "06:00:00",
+      "timeTo": "23:00:00"
+    },
+    ...
+    ]
+}
+with the ID
+/nox/v1/studios/1224532440/utilization/v2/historic?dayOfWeek=WEDNESDAY
+[
+  {
+    "startTime": "06:00:00",
+    "endTime": "07:00:00",
+    "percentage": 5
+  },
+  ...
+]
+and percentage mapping
+/nox/v1/studios/1224532440/utilization/v2/indicator/limits
+{
+  "value": {
+    "utilizationIndicatorLowLimitPercentage": 15,
+    "utilizationIndicatorNormalLimitPercentage": 27
+  }
+}
+"""
 @app.get("/")
 async def serve_index():
     return FileResponse("index.html")
