@@ -1,5 +1,13 @@
 import QRGenerator from "../components/qr";
+import { useNavigate } from "react-router";
 
 export default function Home() {
-  return <QRGenerator content="klasjdlaks"  />;
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <QRGenerator token="klasjdlaks" />
+      <button onClick={() => navigate("/visits")}>visits</button>
+    </>
+  );
 }

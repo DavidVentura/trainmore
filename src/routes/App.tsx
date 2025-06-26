@@ -1,22 +1,31 @@
-import React from 'react';
-import { RouterProvider, createBrowserRouter } from 'react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Login from './Login';
-import Home from './Home';
-import RequireAuth from '../auth/RequireAuth';
+import React from "react";
+import { RouterProvider, createBrowserRouter } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Login from "./Login";
+import Home from "./Home";
+import Visits from "./Visits";
+import RequireAuth from "../auth/RequireAuth";
 
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    path: '/login',
+    path: "/login",
     element: <Login />,
   },
   {
-    path: '/',
+    path: "/",
     element: (
       <RequireAuth>
         <Home />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/visits",
+    element: (
+      <RequireAuth>
+        <Visits />
       </RequireAuth>
     ),
   },

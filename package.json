@@ -17,5 +17,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.2"
+  },
+  "devDependencies": {
+    "prettier": "3.6.1"
   }
 }

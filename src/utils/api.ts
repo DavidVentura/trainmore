@@ -1,14 +1,16 @@
 export const QR_CODE_URL = "https://my.trainmore.nl/nox/v1/customerqrcode/";
-export const CHECKIN_HISTORY_URL = "https://my.trainmore.nl/nox/v1/studios/checkin/history/report";
+export const CHECKIN_HISTORY_URL =
+  "https://my.trainmore.nl/nox/v1/studios/checkin/history/report";
 export const LOGIN_URL = "https://my.trainmore.nl/login";
 export const REGISTER_URL = "https://my.trainmore.nl/v2/public/register";
 
-export const FACILITY_GROUP = "BRANDEDAPPTMBTYDONOTDELETE-A475E445911448AA852F4B86D904D3E2";
+export const FACILITY_GROUP =
+  "BRANDEDAPPTMBTYDONOTDELETE-A475E445911448AA852F4B86D904D3E2";
 export const HEADERS = {
   "x-public-facility-group": FACILITY_GROUP,
   "x-nox-client-type": "APP_V5",
   "x-nox-client-version": "3.68.0",
-  "Content-Type": "application/json"
+  "Content-Type": "application/json",
 } as const;
 
 export interface LoginRequest {
@@ -17,6 +19,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  access_token: string;
+}
+
+export interface ApiRequest {
   access_token: string;
 }
 
@@ -31,11 +37,20 @@ export interface RegisterRequest {
   language?: string;
 }
 
-export interface GymVisit {
+export interface GymVisitResponse {
   checkin_time: string;
   checkout_time: string;
   studio_name: string;
   duration_minutes: number;
+  is_averaged: boolean;
+}
+
+export interface GymVisit {
+  checkin_time: Date;
+  checkout_time: Date;
+  studio_name: string;
+  duration_minutes: number;
+  is_averaged: boolean;
 }
 
 export interface RawGymVisitData {
@@ -55,30 +70,29 @@ export function getErrorMessage(text: string): string | null {
   }
 }
 
-export function createErrorResponse(message: string, status: number = 500): Response {
-  return new Response(
-    JSON.stringify({ error: message }),
-    { 
-      status, 
-      headers: { "Content-Type": "application/json" } 
-    }
-  );
+export function createErrorResponse(
+  message: string,
+  status: number = 500
+): Response {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
-export function createSuccessResponse<T>(data: T, status: number = 200): Response {
-  return new Response(
-    JSON.stringify(data),
-    { 
-      status, 
-      headers: { "Content-Type": "application/json" } 
-    }
-  );
+export function createSuccessResponse<T>(
+  data: T,
+  status: number = 200
+): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }
-
 
 export function getTokenFromRequest(request: Request): string | null {
-  const authHeader = request.headers.get('Authorization');
-  if (authHeader?.startsWith('Bearer ')) {
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
     return authHeader.substring(7);
   }
   return null;
