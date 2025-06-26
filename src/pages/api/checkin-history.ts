@@ -38,10 +38,11 @@ export const GET: APIRoute = async ({ request }) => {
 
     // When you don't check out, duration is capped at 180min
     const nonMaxVisits = visits.filter((v) => v.duration_minutes < 180);
-    const avgDuration =
+    const avgDuration = Math.round(
       nonMaxVisits
         .map((v) => v.duration_minutes)
-        .reduce((acc, cur) => acc + cur, 0) / nonMaxVisits.length;
+        .reduce((acc, cur) => acc + cur, 0) / nonMaxVisits.length
+    );
 
     const averagedDuration = visits.map((x) =>
       x.duration_minutes < 180

@@ -36,7 +36,7 @@ async function getGymVisits({ access_token }: ApiRequest): Promise<GymVisit[]> {
 
 export function useGymVisits(ar: ApiRequest) {
   return useQuery<GymVisit[], Error>({
-    queryKey: ["asd"],
+    queryKey: ["gymvisits"],
     queryFn: () => getGymVisits(ar),
     retry(failureCount, error) {
       // TODO: return false if it's a 401

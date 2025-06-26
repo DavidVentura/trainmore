@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function QRGenerator({ token }: { token: string }) {
+export default function QRGenerator({ content }: { content: string }) {
   const [qrUrl, setQrUrl] = useState<string>("");
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const generateQR = async (tokenValue: string) => {
-    console.log("generate", tokenValue);
+  const generateQR = async (content: string) => {
     const qrModule = await import("../third-party/qr.min.js");
     const qr = qrModule.default || qrModule;
 
-    const gifBytes = qr.encodeQR(tokenValue, "gif", {
+    const gifBytes = qr.encodeQR(content, "gif", {
       ecc: "low",
       version: 2,
       mask: 7,
@@ -28,9 +27,8 @@ export default function QRGenerator({ token }: { token: string }) {
 
   // Generate QR on mount and when token changes
   useEffect(() => {
-    console.log("token", token);
-    if (token) {
-      generateQR(token);
+    if (content) {
+      generateQR(content);
     }
 
     // Cleanup function
@@ -39,7 +37,7 @@ export default function QRGenerator({ token }: { token: string }) {
         URL.revokeObjectURL(qrUrl);
       }
     };
-  }, [token]);
+  }, [content]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -50,18 +48,14 @@ export default function QRGenerator({ token }: { token: string }) {
     };
   }, [qrUrl]);
 
-  return (
-    <div className="qr-generator">
-      <h2>QR Code</h2>
-      {qrUrl && (
-        <img
-          ref={imgRef}
-          src={qrUrl}
-          alt="QR Code"
-          style={{ maxWidth: "100%", height: "auto" }}
-        />
-      )}
-      <button onClick={() => generateQR(token)}>Regenerate QR</button>
-    </div>
+  return qrUrl.length ? (
+    <img
+      ref={imgRef}
+      src={qrUrl}
+      alt="QR Code"
+      style={{ maxWidth: "100%", height: "auto" }}
+    />
+  ) : (
+    <></>
   );
 }

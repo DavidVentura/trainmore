@@ -79,6 +79,7 @@ export default function Visits() {
           )}
         </>
       )}
+      <button onClick={() => navigate("/")}>home</button>
     </div>
   );
 }
