@@ -24,7 +24,7 @@ export default function Login() {
       {
         onSuccess: (data) => {
           localStorage.setItem("access_token", data.access_token);
-          navigate("/");
+          navigate("/qr-code");
         },
       }
     );
@@ -35,7 +35,8 @@ export default function Login() {
   }
   return (
     <Container
-      size="1"
+      size="3"
+      px="2"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -43,7 +44,7 @@ export default function Login() {
         justifyContent: "center",
       }}
     >
-      <Card size="3" style={{ width: "100%", maxWidth: "400px" }}>
+      <Card size="3">
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="4">
             <Text size="6" weight="bold" align="center">

@@ -6,6 +6,9 @@ import Home from "./Home";
 import Visits from "./Visits";
 import RequireAuth from "../auth/RequireAuth";
 import "@radix-ui/themes/styles.css";
+import "../styles/global.css";
+import { Container } from "@radix-ui/themes";
+import QRCode from "./QRCode";
 
 const queryClient = new QueryClient();
 
@@ -27,8 +30,16 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "qr-code",
+        element: <QRCode />,
+      },
+      {
         path: "visits",
         element: <Visits />,
+      },
+      {
+        path: "workout",
+        element: <div>Workout</div>,
       },
     ],
   },
@@ -38,7 +49,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <Container size="3" px="2">
+          <RouterProvider router={router} />
+        </Container>
       </QueryClientProvider>
     </ThemeProvider>
   );

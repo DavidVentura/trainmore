@@ -12,7 +12,6 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       accentColor="lime"
       grayColor="slate"
       radius="full"
-      scaling="90%"
       panelBackground="translucent"
     >
       {children}

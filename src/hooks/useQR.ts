@@ -20,12 +20,11 @@ async function getQR({ access_token }: ApiRequest): Promise<QRResponse> {
 }
 
 export function useQR(ar: ApiRequest, options: { enabled: boolean }) {
-  return useQuery<QRResponse, Error>({
+  return useQuery<QRResponse, Error | ApiError>({
     ...options,
     queryKey: ["qr"],
     queryFn: () => getQR(ar),
     retry(failureCount, error) {
-      // TODO: return false if it's a 401
       console.log(failureCount, error);
       if (error instanceof ApiError && error.status === 401) {
         console.log("unauthorized");
