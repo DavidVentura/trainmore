@@ -1,4 +1,16 @@
 ---
 import App from '../routes/App';
 ---
-<App client:only />
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Trainmore</title>
+	</head>
+	<body>
+    <App client:only />
+	</body>
+</html>
