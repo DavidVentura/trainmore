@@ -1,20 +1,22 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Login from "./Login";
-import Home from "./Home";
-import Visits from "./Visits";
-import RequireAuth from "../auth/RequireAuth";
+import ThemeProvider from '../components/ThemeProvider';
+import Login from './Login';
+import Home from './Home';
+import Visits from './Visits';
+import RequireAuth from '../auth/RequireAuth';
+import '@radix-ui/themes/styles.css';
 
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    path: "/login",
+    path: '/login',
     element: <Login />,
   },
   {
-    path: "/",
+    path: '/',
     element: (
       <RequireAuth>
         <Home />
@@ -22,7 +24,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/visits",
+    path: '/visits',
     element: (
       <RequireAuth>
         <Visits />
@@ -33,8 +35,10 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
