@@ -3,6 +3,7 @@ import {
   type ApiRequest,
   type GymVisitResponse,
   type GymVisit,
+  ApiError,
 } from "../utils/api";
 
 // Returns visits sorted by checkin time (oldest first)
@@ -17,7 +18,7 @@ async function getGymVisits({ access_token }: ApiRequest): Promise<GymVisit[]> {
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
     console.log("throwing, not ok");
-    throw new Error(error?.message || "Getting visits failed");
+    throw new ApiError(error?.message || "Getting visits failed", res.status);
   }
   const parsed: GymVisitResponse[] = await res.json();
 
@@ -39,8 +40,12 @@ export function useGymVisits(ar: ApiRequest) {
     queryKey: ["gymvisits"],
     queryFn: () => getGymVisits(ar),
     retry(failureCount, error) {
-      // TODO: return false if it's a 401
       console.log(failureCount, error);
+
+      if (error instanceof ApiError && error.status === 401) {
+        console.log("unauthorized");
+        return false;
+      }
       return failureCount < 1;
     },
   });

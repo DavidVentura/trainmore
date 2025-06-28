@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useGymVisits } from "../hooks/useVisits";
 import type { GymVisit } from "../utils/api";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 const prettyDate = (d: Date): string => {
   return `${d.getDate()}/${d.getMonth() + 1} ${d.getHours()}:${d.getMinutes()}`;
@@ -35,7 +35,8 @@ export default function Visits() {
   const { data, error } = useGymVisits({ access_token: token });
 
   if (error) {
-    navigate("/login");
+    // TODO 401 vs other
+    return <Navigate to="/login" />;
   }
   if (!data) {
     return <>no data</>;
