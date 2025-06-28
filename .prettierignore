@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+.astro/
+
+# Generated files
+public/
+screenshot/
+
+# Third-party files
+qr.min.js
+
+# Config files that should maintain their format
+*.min.js
+*.min.css
+
+# Lock files
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db 

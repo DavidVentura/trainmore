@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, useNavigate } from 'react-router';
+import { Navigate, useNavigate } from "react-router";
 import {
   Card,
   TextField,
@@ -7,15 +7,15 @@ import {
   Text,
   Flex,
   Container,
-} from '@radix-ui/themes';
-import { useLogin } from '../hooks/useLogin';
+} from "@radix-ui/themes";
+import { useLogin } from "../hooks/useLogin";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { mutate: login, isPending, error, isError } = useLogin();
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ export default function Login() {
       { username, password },
       {
         onSuccess: (data) => {
-          localStorage.setItem('access_token', data.access_token);
-          navigate('/');
+          localStorage.setItem("access_token", data.access_token);
+          navigate("/");
         },
       }
     );
@@ -37,13 +37,13 @@ export default function Login() {
     <Container
       size="1"
       style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Card size="3" style={{ width: '100%', maxWidth: '400px' }}>
+      <Card size="3" style={{ width: "100%", maxWidth: "400px" }}>
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="4">
             <Text size="6" weight="bold" align="center">
@@ -71,12 +71,12 @@ export default function Login() {
             />
 
             <Button type="submit" disabled={isPending} size="3">
-              {isPending ? 'Logging in...' : 'Login'}
+              {isPending ? "Logging in..." : "Login"}
             </Button>
 
             {isError && (
               <Text color="red" size="2" align="center">
-                {error?.message || 'Login failed'}
+                {error?.message || "Login failed"}
               </Text>
             )}
           </Flex>

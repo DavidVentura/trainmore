@@ -1,5 +1,5 @@
-import React from 'react';
-import { Theme } from '@radix-ui/themes';
+import React from "react";
+import { Theme } from "@radix-ui/themes";
 
 interface ThemeProviderProps {
   children: React.ReactNode;

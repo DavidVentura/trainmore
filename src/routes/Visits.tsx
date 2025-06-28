@@ -1,6 +1,6 @@
-import { useGymVisits } from '../hooks/useVisits';
-import type { GymVisit } from '../utils/api';
-import { Navigate, useNavigate } from 'react-router';
+import { useGymVisits } from "../hooks/useVisits";
+import type { GymVisit } from "../utils/api";
+import { Navigate, useNavigate } from "react-router";
 
 const prettyDate = (d: Date): string => {
   return `${d.getDate()}/${d.getMonth() + 1} ${d.getHours()}:${d.getMinutes()}`;
@@ -30,7 +30,7 @@ const workoutDurationSince = (
 
 export default function Visits() {
   const navigate = useNavigate();
-  const token = localStorage.getItem('access_token')!;
+  const token = localStorage.getItem("access_token")!;
   const { data, error } = useGymVisits({ access_token: token });
 
   if (error) {
@@ -61,7 +61,7 @@ export default function Visits() {
                   <td>{prettyDate(x.checkin_time)}</td>
                   <td>
                     {x.duration_minutes}
-                    {x.is_averaged && '*'}
+                    {x.is_averaged && "*"}
                   </td>
                 </tr>
               ))}
@@ -79,7 +79,7 @@ export default function Visits() {
           )}
         </>
       )}
-      <button onClick={() => navigate('/')}>home</button>
+      <button onClick={() => navigate("/")}>home</button>
     </div>
   );
 }
