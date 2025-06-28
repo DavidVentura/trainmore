@@ -1,10 +1,4 @@
-import React from "react";
-import {
-  RouterProvider,
-  createBrowserRouter,
-  Outlet,
-  Navigate,
-} from 'react-router';
+import { RouterProvider, createBrowserRouter, Outlet } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ThemeProvider from '../components/ThemeProvider';
 import Login from './Login';

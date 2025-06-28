@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { useGymVisits } from "../hooks/useVisits";
-import type { GymVisit } from "../utils/api";
-import { Navigate, useNavigate } from "react-router";
+import { useGymVisits } from '../hooks/useVisits';
+import type { GymVisit } from '../utils/api';
+import { Navigate, useNavigate } from 'react-router';
 
 const prettyDate = (d: Date): string => {
   return `${d.getDate()}/${d.getMonth() + 1} ${d.getHours()}:${d.getMinutes()}`;
@@ -31,7 +30,7 @@ const workoutDurationSince = (
 
 export default function Visits() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("access_token")!;
+  const token = localStorage.getItem('access_token')!;
   const { data, error } = useGymVisits({ access_token: token });
 
   if (error) {

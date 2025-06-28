@@ -1,7 +1,7 @@
 import QRGenerator from "../components/qr";
 import { redirect, useNavigate } from "react-router";
 import { useQR } from "../hooks/useQR";
-import { useEffect, useState } from "react";
+import { useEffect } from 'react';
 
 export default function Home() {
   const navigate = useNavigate();
