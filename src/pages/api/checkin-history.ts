@@ -5,9 +5,14 @@ import {
   createErrorResponse,
   createSuccessResponse,
   getTokenFromRequest,
+  type GymVisitData,
   type GymVisitResponse,
   type RawGymVisitData,
 } from "../../utils/api";
+
+const hasCheckoutTime = (item: RawGymVisitData): item is GymVisitData => {
+  return item.checkoutTime !== null;
+};
 
 export const GET: APIRoute = async ({ request }) => {
   try {
@@ -33,6 +38,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     const data: RawGymVisitData[] = await response.json();
     const visits = data
+      .filter(hasCheckoutTime)
       .map(createGymVisit)
       .filter((visit) => visit.duration_minutes > 0);
 
@@ -58,7 +64,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 };
 
-function createGymVisit(data: RawGymVisitData): GymVisitResponse {
+function createGymVisit(data: GymVisitData): GymVisitResponse {
   const checkinTime = parseDateTimeWithTimezone(data.checkinTime);
   const checkoutTime = parseDateTimeWithTimezone(data.checkoutTime);
   const durationMinutes = Math.floor(

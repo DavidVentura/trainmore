@@ -56,6 +56,13 @@ export interface GymVisit {
 export interface RawGymVisitData {
   date: string;
   checkinTime: string;
+  checkoutTime: string | null;
+  studioName: string;
+}
+
+export interface GymVisitData {
+  date: string;
+  checkinTime: string;
   checkoutTime: string;
   studioName: string;
 }
