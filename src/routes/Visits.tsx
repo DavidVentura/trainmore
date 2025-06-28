@@ -62,7 +62,7 @@ export default function Visits() {
                   <td>{prettyDate(x.checkin_time)}</td>
                   <td>
                     {x.duration_minutes}
-                    {x.is_averaged && "*"}
+                    {x.is_averaged && '*'}
                   </td>
                 </tr>
               ))}
@@ -80,7 +80,7 @@ export default function Visits() {
           )}
         </>
       )}
-      <button onClick={() => navigate("/")}>home</button>
+      <button onClick={() => navigate('/')}>home</button>
     </div>
   );
 }

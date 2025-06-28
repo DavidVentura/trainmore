@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from 'react-router';
 import {
   Card,
   TextField,
@@ -15,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { mutate: login, isPending, error, isError } = useLogin();
+  const token = localStorage.getItem('access_token');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +30,9 @@ export default function Login() {
     );
   };
 
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <Container
       size="1"

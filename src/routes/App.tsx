@@ -1,6 +1,11 @@
 import React from "react";
-import { RouterProvider, createBrowserRouter } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Outlet,
+  Navigate,
+} from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ThemeProvider from '../components/ThemeProvider';
 import Login from './Login';
 import Home from './Home';
@@ -19,17 +24,19 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       <RequireAuth>
-        <Home />
+        <Outlet />
       </RequireAuth>
     ),
-  },
-  {
-    path: '/visits',
-    element: (
-      <RequireAuth>
-        <Visits />
-      </RequireAuth>
-    ),
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'visits',
+        element: <Visits />,
+      },
+    ],
   },
 ]);
 
