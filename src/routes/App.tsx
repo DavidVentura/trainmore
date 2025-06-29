@@ -9,6 +9,7 @@ import "@radix-ui/themes/styles.css";
 import "../styles/global.css";
 import { Container } from "@radix-ui/themes";
 import QRCode from "./QRCode";
+import { Toaster } from "../components/common/Toast";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <Container size="3" px="2">
           <RouterProvider router={router} />
+          <Toaster />
         </Container>
       </QueryClientProvider>
     </ThemeProvider>
