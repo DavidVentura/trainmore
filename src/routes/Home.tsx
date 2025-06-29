@@ -20,7 +20,7 @@ export default function Home() {
                 <Link to="/qr-code">
                   <Flex align="center" gap="2">
                     <QrCodeIcon strokeWidth={2} />
-                    <Text weight="bold">Access QR Code</Text>
+                    <Text weight="bold">Entry QR Code</Text>
                   </Flex>
                 </Link>
               </Card>

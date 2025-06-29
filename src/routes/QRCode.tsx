@@ -1,14 +1,24 @@
-import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 import { useQR } from "../hooks/useQR";
 import QRGenerator from "../components/qr";
 import { ApiError } from "../utils/api";
 import { useLogout } from "../hooks/useLogout";
+import {
+  Badge,
+  Box,
+  Button,
+  Card,
+  Container,
+  Flex,
+  Heading,
+  Text,
+} from "@radix-ui/themes";
+import { Ban } from "lucide-react";
 
 export default function QRCode() {
-  const navigate = useNavigate();
   const token = localStorage.getItem("access_token")!;
   const logout = useLogout();
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   const { data, error, refetch } = useQR(
     { access_token: token },
@@ -16,55 +26,81 @@ export default function QRCode() {
   );
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (data) {
-      const date = new Date(data.expiry_date);
-      const now = new Date();
-      const ttl = date.getTime() - now.getTime();
-      console.log(`ttl ${ttl}`);
+    if (!data || error) return;
 
-      if (ttl <= 10) {
-        console.log("refetching because it was in the past");
+    const updateTimeRemaining = () => {
+      const expiryDate = new Date(data.expiry_date);
+      const now = new Date();
+      const diff = expiryDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining("Expired");
         void refetch();
         return;
       }
 
-      console.log("setting the timer");
-      timer = setTimeout(async () => {
-        console.log("refetching");
-        await refetch();
-      }, ttl);
-    }
-
-    return () => {
-      if (timer) {
-        console.log("remove");
-        clearTimeout(timer);
-      }
+      const minutes = Math.floor(diff / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeRemaining(`${minutes}:${seconds.toString().padStart(2, "0")}`);
     };
+    updateTimeRemaining();
+
+    const interval = setInterval(updateTimeRemaining, 1000);
+    return () => clearInterval(interval);
   }, [data, refetch]);
 
-  if (error) {
-    if (error instanceof ApiError && error.status === 401) {
-      logout();
-    }
-    console.log("failed to qr", error);
-    return (
-      <div className="qr-error">
-        <p>Failed to load QR code. Please try again.</p>
-        <button onClick={() => refetch()}>Retry</button>
-      </div>
-    );
+  if (error && error instanceof ApiError && error.status === 401) {
+    logout();
   }
 
   return (
-    <div className="qr-content">
-      <h2>QR Code</h2>
-      {data && <QRGenerator content={data.content} />}
-      <div className="qr-actions">
-        <button onClick={() => navigate("/visits")}>View Visits</button>
-        <button onClick={() => refetch()}>Regenerate QR</button>
-      </div>
-    </div>
+    <Card size="3">
+      <Flex direction="column" gap="4" align="stretch">
+        <Flex justify="between" align="center">
+          <Heading as="h3">Entry QR Code</Heading>
+          {timeRemaining && (
+            <Badge color="gray" size="3">
+              {timeRemaining}
+            </Badge>
+          )}
+        </Flex>
+        <Container align="center">
+          {error ? (
+            <Card variant="surface">
+              <Flex
+                direction="column"
+                align="center"
+                justify="center"
+                height="300px"
+              >
+                <Flex
+                  height="48px"
+                  width="48px"
+                  align="center"
+                  justify="center"
+                >
+                  <Text asChild color="red">
+                    <Ban />
+                  </Text>
+                </Flex>
+                <Text as="p" align="center" color="red">
+                  Failed to load QR code. Please try again.
+                </Text>
+              </Flex>
+            </Card>
+          ) : (
+            data && (
+              <Box mx="auto" width="fit-content">
+                <QRGenerator content={data.content} size={300} />
+              </Box>
+            )
+          )}
+        </Container>
+
+        <Button onClick={() => refetch()} size="3">
+          Regenerate QR
+        </Button>
+      </Flex>
+    </Card>
   );
 }

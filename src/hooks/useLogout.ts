@@ -5,7 +5,7 @@ export const useLogout = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token");
-    toast.error("Logged out");
+    toast.error("Session expired");
     navigate("/login");
   };
 
