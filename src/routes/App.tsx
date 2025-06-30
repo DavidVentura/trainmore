@@ -7,22 +7,34 @@ import Visits from "./Visits";
 import RequireAuth from "../auth/RequireAuth";
 import "@radix-ui/themes/styles.css";
 import "../styles/global.css";
-import { Container } from "@radix-ui/themes";
+import { Container, Text } from "@radix-ui/themes";
 import QRCode from "./QRCode";
 import { Toaster } from "../components/common/Toast";
+import { Layout } from "../components/common/Layout";
 
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <Container size="3" px="2">
+        <Login />
+      </Container>
+    ),
   },
   {
     path: "/",
     element: (
       <RequireAuth>
-        <Outlet />
+        <Layout.Root>
+          <Layout.Main>
+            <Outlet />
+          </Layout.Main>
+          <Layout.Footer>
+            <Text>Footer</Text>
+          </Layout.Footer>
+        </Layout.Root>
       </RequireAuth>
     ),
     children: [
@@ -50,11 +62,10 @@ export default function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <Container size="3" px="2">
-          <RouterProvider router={router} />
-          <Toaster />
-        </Container>
+        <RouterProvider router={router} />
+        <Toaster />
       </QueryClientProvider>
     </ThemeProvider>
   );
 }
+
