@@ -3,17 +3,21 @@ import { useGymVisits } from "../hooks/useVisits";
 import type { GymVisit } from "../utils/api";
 import { Navigate } from "react-router";
 import {
+  addDays,
   endOfMonth,
   endOfWeek,
   format,
   isAfter,
   isBefore,
+  isSameDay,
+  isToday,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
 import {
   Asterisk,
   Calendar,
+  CalendarCheck,
   ChartBar,
   ClockArrowDown,
   ClockArrowUp,
@@ -33,19 +37,21 @@ const prettyDuration = (min: number): string => {
   return `${Math.floor(min / 60)}h ${min % 60}m`;
 };
 
-const workoutDurationSince = (
+const visitsInRange = (
   visits: GymVisit[],
   start: Date,
   end: Date
-): number => {
-  return visits
-    .filter(
-      (item) =>
-        isAfter(item.checkin_time, start) && isBefore(item.checkin_time, end)
-    )
-    .reduce((acc, cur) => {
-      return acc + cur.duration_minutes;
-    }, 0);
+): GymVisit[] => {
+  return visits.filter(
+    (item) =>
+      isAfter(item.checkin_time, start) && isBefore(item.checkin_time, end)
+  );
+};
+
+const workoutDuration = (visits: GymVisit[]): number => {
+  return visits.reduce((acc, cur) => {
+    return acc + cur.duration_minutes;
+  }, 0);
 };
 
 export default function Visits() {
@@ -58,6 +64,7 @@ export default function Visits() {
     startOfMonth: startOfMonth(today),
     endOfMonth: endOfMonth(today),
   };
+
   if (error) {
     // TODO 401 vs other
     return <Navigate to="/login" />;
@@ -65,6 +72,20 @@ export default function Visits() {
   if (!data) {
     return <>no data</>;
   }
+
+  const thisWeekVisits = visitsInRange(
+    data,
+    dates.startOfWeek,
+    dates.endOfWeek
+  );
+  const thisWeekCalendar = new Array(7).fill(null).map((_, i) => {
+    const date = addDays(dates.startOfWeek, i);
+    const visited = data.some((x) => isSameDay(x.checkin_time, date));
+    return {
+      date,
+      visited,
+    };
+  });
 
   return (
     <Card size="3">
@@ -86,10 +107,8 @@ export default function Visits() {
                 </Text>
                 <Text size="3" weight="bold">
                   {prettyDuration(
-                    workoutDurationSince(
-                      data,
-                      dates.startOfWeek,
-                      dates.endOfWeek
+                    workoutDuration(
+                      visitsInRange(data, dates.startOfWeek, dates.endOfWeek)
                     )
                   )}
                 </Text>
@@ -103,10 +122,8 @@ export default function Visits() {
                 </Text>
                 <Text size="3" weight="bold">
                   {prettyDuration(
-                    workoutDurationSince(
-                      data,
-                      dates.startOfMonth,
-                      dates.endOfMonth
+                    workoutDuration(
+                      visitsInRange(data, dates.startOfMonth, dates.endOfMonth)
                     )
                   )}
                 </Text>
@@ -119,12 +136,41 @@ export default function Visits() {
                   All time
                 </Text>
                 <Text size="3" weight="bold">
-                  {prettyDuration(
-                    workoutDurationSince(data, new Date(0), today)
-                  )}
+                  {prettyDuration(workoutDuration(data))}
                 </Text>
               </Flex>
             </Card>
+          </Grid>
+        </Flex>
+
+        <Flex direction="column" gap="3">
+          <Heading as="h4" size="2" icon={CalendarCheck}>
+            This week
+          </Heading>
+          <Grid columns="7" gap="1">
+            {thisWeekCalendar.map((x) => (
+              <Card
+                key={x.date.toISOString()}
+                variant="surface"
+                data-accent-card={x.visited}
+                data-accent-card-border={isToday(x.date)}
+                className="card"
+              >
+                <Flex direction="column" gap="0" align="center">
+                  <Text
+                    size="1"
+                    weight="light"
+                    align="center"
+                    style={{ textTransform: "uppercase" }}
+                  >
+                    {format(x.date, "ccc")}
+                  </Text>
+                  <Text size="6" weight="bold" align="center">
+                    {format(x.date, "dd")}
+                  </Text>
+                </Flex>
+              </Card>
+            ))}
           </Grid>
         </Flex>
 

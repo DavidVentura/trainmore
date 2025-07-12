@@ -2,6 +2,16 @@ body {
   margin: 0;
 }
 
+.card[data-accent-card="true"] {
+  --card-background-color: var(--accent-a11);
+  color: var(--accent-contrast);
+  --base-card-surface-box-shadow: none
+}
+
+.card[data-accent-card-border="true"] {
+  --base-card-surface-box-shadow: 0 0 0 1px var(--accent-a11);
+}
+
 .animated-gradient-card {
   background: linear-gradient(-45deg, var(--sky-7), var(--lime-7), var(--yellow-7));
   background-size: 400% 400%;
