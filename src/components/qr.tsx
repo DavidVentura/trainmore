@@ -1,61 +1,151 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import qr from "../third-party/qr.min.js";
 
-export default function QRGenerator({ content }: { content: string }) {
-  const [qrUrl, setQrUrl] = useState<string>("");
+interface Props {
+  content: string;
+  className?: string;
+  size?: number;
+  alt?: string;
+}
+
+interface QRState {
+  url: string | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const QRGenerator = ({
+  content,
+  className = "",
+  size = 300,
+  alt = "QR Code",
+}: Props) => {
+  const [state, setState] = useState<QRState>({
+    url: null,
+    isLoading: false,
+    error: null,
+  });
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const generateQR = async (content: string) => {
-    const qrModule = await import("../third-party/qr.min.js");
-    const qr = qrModule.default || qrModule;
-
-    const gifBytes = qr.encodeQR(content, "gif", {
-      ecc: "low",
-      version: 2,
-      mask: 7,
-      scale: 11,
-    });
-
-    const blob = new Blob([gifBytes], { type: "image/gif" });
-    const url = URL.createObjectURL(blob);
-    if (qrUrl) {
-      URL.revokeObjectURL(qrUrl);
+  const generateQR = useCallback((content: string) => {
+    if (!content.trim()) {
+      setState((prev) => ({
+        ...prev,
+        error: "No content provided",
+        isLoading: false,
+      }));
+      return;
     }
 
-    setQrUrl(url);
-    return <img src={qrUrl} />;
-  };
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-  // Generate QR on mount and when token changes
+    try {
+      const gifBytes = qr.encodeQR(content, "gif", {
+        ecc: "low",
+        version: 2,
+        mask: 7,
+        scale: 11,
+      });
+
+      const blob = new Blob([gifBytes], { type: "image/gif" });
+      const url = URL.createObjectURL(blob);
+
+      setState((prev) => ({
+        url,
+        isLoading: false,
+        error: null,
+      }));
+    } catch (error) {
+      console.error("Failed to generate QR code:", error);
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: "Failed to generate QR code",
+      }));
+    }
+  }, []);
+
   useEffect(() => {
     if (content) {
       generateQR(content);
     }
+  }, [content, generateQR]);
 
-    // Cleanup function
-    return () => {
-      if (qrUrl) {
-        URL.revokeObjectURL(qrUrl);
-      }
-    };
-  }, [content]);
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (qrUrl) {
-        URL.revokeObjectURL(qrUrl);
+      if (state.url) {
+        URL.revokeObjectURL(state.url);
       }
     };
-  }, [qrUrl]);
+  }, [state.url]);
 
-  return qrUrl.length ? (
+  if (state.isLoading) {
+    return (
+      <div
+        className={`qr-loading ${className}`}
+        style={{
+          width: size,
+          height: size,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px",
+        }}
+        aria-label="Generating QR code..."
+      >
+        <span>Generating QR code...</span>
+      </div>
+    );
+  }
+
+  if (state.error) {
+    return (
+      <div
+        className={`qr-error ${className}`}
+        style={{
+          width: size,
+          height: size,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "1px solid #ff6b6b",
+          borderRadius: "8px",
+          backgroundColor: "#fff5f5",
+          color: "#e53e3e",
+        }}
+        role="alert"
+        aria-live="polite"
+      >
+        <span>{state.error}</span>
+      </div>
+    );
+  }
+
+  if (!state.url) {
+    return null;
+  }
+
+  return (
     <img
       ref={imgRef}
-      src={qrUrl}
-      alt="QR Code"
-      style={{ maxWidth: "100%", height: "auto" }}
+      src={state.url}
+      alt={alt}
+      className={`qr-code ${className}`}
+      style={{
+        maxWidth: "100%",
+        height: "auto",
+        width: size,
+        borderRadius: "8px",
+      }}
+      onError={() => {
+        setState((prev) => ({
+          ...prev,
+          error: "Failed to load QR code image",
+        }));
+      }}
     />
-  ) : (
-    <></>
   );
-}
+};
+
+export default QRGenerator;

@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (!token) {
       return createErrorResponse(
         "Token required. Provide via Authorization: Bearer <token> header",
-        401,
+        401
       );
     }
 
@@ -39,7 +39,7 @@ export const GET: APIRoute = async ({ request }) => {
     return createSuccessResponse(qrResponse);
   } catch (error) {
     return createErrorResponse(
-      error instanceof Error ? error.message : "Unknown error",
+      error instanceof Error ? error.message : "Unknown error"
     );
   }
 };

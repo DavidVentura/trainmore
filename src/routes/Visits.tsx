@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from "react";
 import { useGymVisits } from "../hooks/useVisits";
 import type { GymVisit } from "../utils/api";
 import { Navigate, useNavigate } from "react-router";

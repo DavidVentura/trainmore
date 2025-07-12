@@ -1,0 +1,35 @@
+.layout-root {
+  --header-height: 10rem;
+  --footer-height: 4.875rem;
+  display: grid;
+  height: 100vh;
+  min-height: 100vh;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+}
+
+.layout-header {
+  grid-area: header;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gray-1);
+}
+
+.layout-main {
+  grid-area: main;
+}
+
+.layout-footer {
+  grid-area: footer;
+  height: var(--footer-height);
+  min-height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-panel-translucent);
+}

@@ -7,5 +7,6 @@ export default function RequireAuth({
   children: React.ReactNode;
 }) {
   const token = localStorage.getItem("access_token");
-  return token ? children : <Navigate to="/login"></Navigate>;
+
+  return token ? children : <Navigate to="/login" replace />;
 }

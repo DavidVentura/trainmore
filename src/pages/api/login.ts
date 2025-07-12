@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
       const errorMessage = getErrorMessage(errorText);
       return createErrorResponse(
         errorMessage || `Request failed: ${errorText}`,
-        401,
+        401
       );
     }
 
@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request }) => {
     return createSuccessResponse(loginResponse);
   } catch (error) {
     return createErrorResponse(
-      error instanceof Error ? error.message : "Unknown error",
+      error instanceof Error ? error.message : "Unknown error"
     );
   }
 };
