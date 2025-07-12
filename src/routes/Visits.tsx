@@ -1,4 +1,13 @@
-import { Card, Flex, Grid, Table, Text, Tooltip } from "@radix-ui/themes";
+import {
+  Card,
+  Flex,
+  Grid,
+  Skeleton,
+  Spinner,
+  Table,
+  Text,
+  Tooltip,
+} from "@radix-ui/themes";
 import { useGymVisits } from "../hooks/useVisits";
 import type { GymVisit } from "../utils/api";
 import { Navigate } from "react-router";
@@ -25,10 +34,7 @@ import {
   Timer,
 } from "lucide-react";
 import { Heading } from "../components/common/Heading";
-
-const elapsedDays = (d: Date): number => {
-  return (Date.now() - d.getTime()) / 86_400_000;
-};
+import { useMemo } from "react";
 
 const prettyDuration = (min: number): string => {
   if (min < 60) {
@@ -56,37 +62,63 @@ const workoutDuration = (visits: GymVisit[]): number => {
 
 export default function Visits() {
   const token = localStorage.getItem("access_token")!;
-  const { data, error } = useGymVisits({ access_token: token });
+  const { data, error, isLoading } = useGymVisits({ access_token: token });
   const today = new Date();
-  const dates = {
-    startOfWeek: startOfWeek(today),
-    endOfWeek: endOfWeek(today),
-    startOfMonth: startOfMonth(today),
-    endOfMonth: endOfMonth(today),
-  };
+  const dates = useMemo(
+    () => ({
+      startOfWeek: startOfWeek(today),
+      endOfWeek: endOfWeek(today),
+      startOfMonth: startOfMonth(today),
+      endOfMonth: endOfMonth(today),
+    }),
+    [today]
+  );
+
+  const thisWeekVisits = useMemo(
+    () => visitsInRange(data ?? [], dates.startOfWeek, dates.endOfWeek),
+    [data, dates]
+  );
+
+  const thisWeekCalendar = useMemo(
+    () =>
+      new Array(7).fill(null).map((_, i) => {
+        const date = addDays(dates.startOfWeek, i);
+        const visited = thisWeekVisits.some((x) =>
+          isSameDay(x.checkin_time, date)
+        );
+        return {
+          date,
+          visited,
+        };
+      }),
+    [thisWeekVisits, dates]
+  );
+
+  const overview = useMemo(() => {
+    return [
+      {
+        label: "This week",
+        duration: prettyDuration(workoutDuration(thisWeekVisits)),
+      },
+      {
+        label: "This month",
+        duration: prettyDuration(
+          workoutDuration(
+            visitsInRange(data ?? [], dates.startOfMonth, dates.endOfMonth)
+          )
+        ),
+      },
+      {
+        label: "All time",
+        duration: prettyDuration(workoutDuration(data ?? [])),
+      },
+    ];
+  }, [thisWeekVisits, data, dates]);
 
   if (error) {
     // TODO 401 vs other
     return <Navigate to="/login" />;
   }
-  if (!data) {
-    return <>no data</>;
-  }
-
-  const thisWeekVisits = visitsInRange(
-    data,
-    dates.startOfWeek,
-    dates.endOfWeek
-  );
-  const thisWeekCalendar = new Array(7).fill(null).map((_, i) => {
-    const date = addDays(dates.startOfWeek, i);
-    const visited = data.some((x) => isSameDay(x.checkin_time, date));
-    return {
-      date,
-      visited,
-    };
-  });
-
   return (
     <Card size="3">
       <Heading as="h3" mb="6">
@@ -100,46 +132,23 @@ export default function Visits() {
           </Heading>
 
           <Grid columns="3" gap="3">
-            <Card variant="surface">
-              <Flex direction="column" gap="0" justify="between" height="100%">
-                <Text size="1" weight="light">
-                  This week
-                </Text>
-                <Text size="3" weight="bold">
-                  {prettyDuration(
-                    workoutDuration(
-                      visitsInRange(data, dates.startOfWeek, dates.endOfWeek)
-                    )
-                  )}
-                </Text>
-              </Flex>
-            </Card>
-
-            <Card variant="surface">
-              <Flex direction="column" gap="0" justify="between" height="100%">
-                <Text size="1" weight="light">
-                  This month
-                </Text>
-                <Text size="3" weight="bold">
-                  {prettyDuration(
-                    workoutDuration(
-                      visitsInRange(data, dates.startOfMonth, dates.endOfMonth)
-                    )
-                  )}
-                </Text>
-              </Flex>
-            </Card>
-
-            <Card variant="surface">
-              <Flex direction="column" gap="0" justify="between" height="100%">
-                <Text size="1" weight="light">
-                  All time
-                </Text>
-                <Text size="3" weight="bold">
-                  {prettyDuration(workoutDuration(data))}
-                </Text>
-              </Flex>
-            </Card>
+            {overview.map((x) => (
+              <Card variant="surface">
+                <Flex
+                  direction="column"
+                  gap="0"
+                  justify="between"
+                  height="100%"
+                >
+                  <Text size="1" weight="light">
+                    {x.label}
+                  </Text>
+                  <Text size="3" weight="bold">
+                    <Skeleton loading={isLoading}>{x.duration}</Skeleton>
+                  </Text>
+                </Flex>
+              </Card>
+            ))}
           </Grid>
         </Flex>
 
@@ -225,40 +234,54 @@ export default function Visits() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.toReversed().map((x, i) => (
-                <Table.Row key={i}>
-                  <Table.Cell>
-                    {format(x.checkin_time, "ccc, dd/MM")}
-                  </Table.Cell>
-                  <Table.Cell align="right">
-                    {format(x.checkin_time, "HH:mm")}{" "}
-                    <Text color="gray" size="1" weight="light">
-                      HS
-                    </Text>
-                  </Table.Cell>
-                  <Table.Cell align="right">
-                    {x.is_averaged && "~"}
-                    {format(x.checkout_time, "HH:mm")}{" "}
-                    <Text color="gray" size="1" weight="light">
-                      HS
-                    </Text>
-                  </Table.Cell>
-                  <Table.Cell align="right">
-                    {x.is_averaged && (
-                      <Tooltip content="Averaged">
-                        <Asterisk
-                          size={18}
-                          style={{ verticalAlign: "text-top" }}
-                        />
-                      </Tooltip>
-                    )}
-                    {x.duration_minutes}
-                    <Text color="gray" size="1" weight="light">
-                      {`'`}
-                    </Text>
+              {isLoading ? (
+                <Table.Row>
+                  <Table.Cell colSpan={4} align="center" py="9">
+                    <Spinner size="3" />
                   </Table.Cell>
                 </Table.Row>
-              ))}
+              ) : data ? (
+                data.toReversed().map((x, i) => (
+                  <Table.Row key={i}>
+                    <Table.Cell>
+                      {format(x.checkin_time, "ccc, dd/MM")}
+                    </Table.Cell>
+                    <Table.Cell align="right">
+                      {format(x.checkin_time, "HH:mm")}{" "}
+                      <Text color="gray" size="1" weight="light">
+                        HS
+                      </Text>
+                    </Table.Cell>
+                    <Table.Cell align="right">
+                      {x.is_averaged && "~"}
+                      {format(x.checkout_time, "HH:mm")}{" "}
+                      <Text color="gray" size="1" weight="light">
+                        HS
+                      </Text>
+                    </Table.Cell>
+                    <Table.Cell align="right">
+                      {x.is_averaged && (
+                        <Tooltip content="Averaged">
+                          <Asterisk
+                            size={18}
+                            style={{ verticalAlign: "text-top" }}
+                          />
+                        </Tooltip>
+                      )}
+                      {x.duration_minutes}
+                      <Text color="gray" size="1" weight="light">
+                        {`'`}
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
+                ))
+              ) : (
+                <Table.Row>
+                  <Table.Cell colSpan={4} align="center" py="9">
+                    Not available data
+                  </Table.Cell>
+                </Table.Row>
+              )}
             </Table.Body>
           </Table.Root>
         </Flex>
