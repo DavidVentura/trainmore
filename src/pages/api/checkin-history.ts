@@ -33,9 +33,15 @@ export const GET: APIRoute = async ({ request }) => {
     });
 
     if (!response.ok) {
-      return createErrorResponse("Invalid or expired token", 401);
+      if (response.status === 401) {
+        return createErrorResponse("Invalid or expired token", 401);
+      } else {
+        return createErrorResponse(
+          "Failed to fetch checkin history",
+          response.status
+        );
+      }
     }
-
     const data: RawGymVisitData[] = await response.json();
     const visits = data
       .filter(hasCheckoutTime)
@@ -58,6 +64,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     return createSuccessResponse(averagedDuration);
   } catch (error) {
+    console.error(error);
     return createErrorResponse(
       error instanceof Error ? error.message : "Unknown error"
     );
