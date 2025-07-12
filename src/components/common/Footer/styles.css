@@ -1,0 +1,23 @@
+.footer-root {
+  width: 100%;
+  max-width: 22rem;
+}
+
+.footer-item-container {
+  flex: 1;
+}
+
+.footer-item {
+  height: var(--footer-height);
+  color: var(--gray-10);
+}
+
+.footer-item:hover {
+  color: var(--gray-12);
+  background-color: var(--gray-3);
+}
+
+.footer-item[data-active="true"] {
+  background-color: var(--lime-a2);
+  color: var(--lime-12);
+}

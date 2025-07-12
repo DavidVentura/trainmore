@@ -11,6 +11,7 @@ import { Container, Text } from "@radix-ui/themes";
 import QRCode from "./QRCode";
 import { Toaster } from "../components/common/Toast";
 import { Layout } from "../components/common/Layout";
+import { Footer } from "../components/common/Footer";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
             <Outlet />
           </Layout.Main>
           <Layout.Footer>
-            <Text>Footer</Text>
+            <Footer />
           </Layout.Footer>
         </Layout.Root>
       </RequireAuth>
